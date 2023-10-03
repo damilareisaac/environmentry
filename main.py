@@ -14,7 +14,7 @@ async def main():
     if not sensors_ids:
         logger(to_console=True).info("No sensors found")
         return None
-    sensors_ids = sensors_ids[:100]
+    # sensors_ids = sensors_ids[:100]
     logger(to_console=True).info(f"Total sensors {len(sensors_ids)}")
     list_of_sensor_data_list = await fetch_from_api.get_all_details_from_sensors(
         sensors_ids
