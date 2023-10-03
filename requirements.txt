@@ -1,0 +1,6 @@
+paho-mqtt
+pandas
+pika
+sqlalchemy
+marshmallow
+marshmallow_sqlalchemy
