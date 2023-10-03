@@ -1,30 +1,29 @@
 import asyncio
 from functools import partial
 from itertools import chain
-from multiprocessing import get_logger
+
 from config import BASE_URL, END_DATE, SENSORS_CSV_URL, START_DATE
+from logs import get_logger
 from schema import MetricSchema
 from .utils import http_get_async
 import pandas as pd
 
+logger = get_logger(__name__)
+
 
 class FetchFromApi:
-    logger = partial(get_logger, __name__)
-
     async def fetch_sensor_data_async(self, sensor_id):
-        self.logger(to_console=True).info(f"Fetching data for sensor {sensor_id}")
+        logger.info(f"Fetching data for sensor {sensor_id}")
         url = f"{BASE_URL}/sensors/{sensor_id}/data/json/?starttime={START_DATE}&endtime={END_DATE}"
         response = await http_get_async(url)
         if not response:
-            self.logger(to_console=True).info(
-                "No response found for sensor {sensor_id}"
-            )
+            logger.info("No response found for sensor {sensor_id}")
             return
 
         sensor_information = response.get("sensors")[0]
         data = sensor_information.get("data")
         if not data:
-            self.logger(to_console=True).info("No data found for sensor {sensor_id}")
+            logger.info(f"No data found for sensor {sensor_id}")
             return {}
 
         data = list(chain.from_iterable(data.values()))
@@ -43,5 +42,5 @@ class FetchFromApi:
                 sensors_df.set_index("Raw ID", inplace=True)
             return list(set(sensors_df["Sensor Name"].values))
         except Exception as e:
-            self.logger(to_console=True).exception(str(e))
+            logger.exception(e.args[0])
             return None
